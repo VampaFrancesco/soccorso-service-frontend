@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html lang="it">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - SoccorsoWeb</title>
+    <link rel="stylesheet" href="css/dashboard.css">
+
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+
+    <!-- SweetAlert2 CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+</head>
+
+<body>
+    <!-- HEADER -->
+    <header>
+        <div class="header-content">
+            <h1>🚑 SoccorsoWeb - Dashboard</h1>
+            <div class="user-info">
+                <a href="index.html" style="color: white; text-decoration: none; margin-right: 1rem; opacity: 0.9;">
+                    🏠 Home
+                </a>
+                <span id="userEmail">utente@soccorsoweb.it</span>
+                <span id="userRole" style="opacity: 0.8;"></span>
+                <button id="logoutBtn" class="btn-logout">Logout</button>
+            </div>
+        </div>
+    </header>
+
+    <!-- TABS -->
+    <nav class="tabs">
+        <button class="tab-btn active" data-tab="richieste">📋 Richieste</button>
+        <button class="tab-btn" data-tab="missioni">🚀 Missioni</button>
+        <button class="tab-btn" data-tab="missioni-non-positive">⚠️ Missioni Non Positive</button>
+        <button class="tab-btn" data-tab="operatori">👥 Operatori Liberi</button>
+    </nav>
+
+    <!-- MAIN CONTENT -->
+    <main>
+        <!-- Tab Content: Richieste di Soccorso -->
+        <div id="richieste" class="tab-content active">
+            <div class="section-header">
+                <h2>Richieste di Soccorso</h2>
+                <div class="filters">
+                    <label>Filtra:</label>
+                    <select id="statoFilter">
+                        <option value="ATTIVA">Attive</option>
+                        <option value="IN_CORSO">In Corso</option>
+                        <option value="INVIATA">Inviata</option>
+                        <option value="CONVALIDATA">Convalidata</option>
+                        <option value="CHIUSA">Chiuse</option>
+                        <option value="IGNORATA">Ignorate</option>
+                        <option value="ANNULLATA">Annullata</option>
+                        <option value="TUTTE">Tutte</option>
+                    </select>
+                </div>
+            </div>
+            <div id="richiesteList" class="card-grid"></div>
+            <div class="pagination">
+                <button class="btn-secondary">← Prec</button>
+                <span id="pageInfo">Pagina 1</span>
+                <button class="btn-secondary">Succ →</button>
+            </div>
+        </div>
+
+
+        <!-- Tab Content: Tutte le Missioni -->
+        <div id="missioni" class="tab-content">
+            <div class="section-header">
+                <h2>Tutte le Missioni</h2>
+            </div>
+            <div id="missioniList" class="card-grid"></div>
+        </div>
+
+        <!-- Tab Content: Missioni Non Positive -->
+        <div id="missioni-non-positive" class="tab-content">
+            <div class="section-header">
+                <h2>Missioni Non Positive (Successo &lt; 5)</h2>
+            </div>
+            <div id="missioniNonPositiveList" class="card-grid"></div>
+        </div>
+
+        <!-- Tab Content: Operatori Liberi -->
+        <div id="operatori" class="tab-content">
+            <div class="section-header">
+                <h2>Operatori Liberi</h2>
+                <button id="btnAggiornaOperatori" class="btn-primary">🔄 Aggiorna</button>
+            </div>
+            <div class="table-container">
+                <table id="operatoriTable">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Nome</th>
+                            <th>Email</th>
+                            <th>Telefono</th>
+                            <th>Azioni</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Popolato da JS -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+
+    <!-- Modal: Dettagli Richiesta -->
+    <div id="richiestaModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>Dettagli Richiesta #<span id="richiestaId"></span></h2>
+
+            <div class="detail-grid">
+                <div class="detail-item">
+                    <label>Stato:</label>
+                    <span id="richiestaStato" class="badge"></span>
+                </div>
+
+                <div class="detail-item">
+                    <label>ID Missione:</label>
+                    <span id="richiestaMissioneId"></span>
+                </div>
+
+                <div class="detail-item">
+                    <label>Nome:</label>
+                    <span id="richiestaNome"></span>
+                </div>
+
+                <div class="detail-item">
+                    <label>Email:</label>
+                    <span id="richiestaEmail"></span>
+                </div>
+
+                <div class="detail-item">
+                    <label>Telefono:</label>
+                    <span id="richiestaTelefono"></span>
+                </div>
+
+                <div class="detail-item">
+                    <label>IP Origine:</label>
+                    <span id="richiestaIP"></span>
+                </div>
+
+                <div class="detail-item full-width">
+                    <label>Indirizzo:</label>
+                    <span id="richiestaIndirizzo"></span>
+                </div>
+
+                <div class="detail-item">
+                    <label>Creata il:</label>
+                    <span id="richiestaCreatedAt"></span>
+                </div>
+
+                <div class="detail-item">
+                    <label>Aggiornata il:</label>
+                    <span id="richiestaUpdatedAt"></span>
+                </div>
+
+                <div class="detail-item">
+                    <label>Convalidata il:</label>
+                    <span id="richiestaConvalidataAt"></span>
+                </div>
+
+                <div class="detail-item full-width">
+                    <label>Descrizione:</label>
+                    <p id="richiestaNote"></p>
+                </div>
+
+                <div class="detail-item full-width" id="richiestaFotoContainer" style="display:none;">
+                    <label>Foto:</label>
+                    <img id="richiestaFoto" style="max-width: 100%; border-radius: 8px; margin-top: 10px;" />
+                </div>
+
+                <div class="detail-item full-width">
+                    <label>Posizione:</label>
+                    <div id="richiestaMap" style="height: 300px; border-radius: 8px; margin-top: 10px;"></div>
+                </div>
+            </div>
+
+            <div class="modal-actions">
+                <button id="btnCreaMissione" class="btn-primary">Crea Missione</button>
+                <button id="btnModificaRichiesta" class="btn-secondary">Modifica</button>
+                <button id="annullaRichiestaBtn" class="btn-danger">Annulla Richiesta</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal: Dettagli Missione -->
+    <div id="missioneModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>Dettagli Missione #<span id="missioneId"></span></h2>
+
+            <div class="detail-grid">
+                <div class="detail-item">
+                    <label>Stato:</label>
+                    <span id="missioneStato" class="badge"></span>
+                </div>
+
+                <div class="detail-item">
+                    <label>ID Richiesta:</label>
+                    <span id="missioneRichiestaId"></span>
+                </div>
+
+                <div class="detail-item">
+                    <label>Valutazione:</label>
+                    <span id="missioneValutazione"></span>/10
+                </div>
+
+                <div class="detail-item">
+                    <label>N° Operatori:</label>
+                    <span id="missioneNumeroOperatori"></span>
+                </div>
+
+                <div class="detail-item">
+                    <label>Inizio:</label>
+                    <span id="missioneDataInizio"></span>
+                </div>
+
+                <div class="detail-item">
+                    <label>Fine:</label>
+                    <span id="missioneDataFine"></span>
+                </div>
+
+                <div class="detail-item">
+                    <label>Creata il:</label>
+                    <span id="missioneCreatedAt"></span>
+                </div>
+
+                <div class="detail-item">
+                    <label>Aggiornata il:</label>
+                    <span id="missioneUpdatedAt"></span>
+                </div>
+
+                <div class="detail-item full-width">
+                    <label>Obiettivo:</label>
+                    <p id="missioneObiettivo"></p>
+                </div>
+
+                <div class="detail-item full-width">
+                    <label>Posizione Attuale:</label>
+                    <p id="missionePosizione"></p>
+                </div>
+
+                <div class="detail-item full-width">
+                    <label>Commenti Finali:</label>
+                    <p id="missioneCommenti"></p>
+                </div>
+
+                <div class="detail-item full-width">
+                    <label>Caposquadra:</label>
+                    <p id="missioneCaposquadra"></p>
+                </div>
+
+                <div class="detail-item full-width">
+                    <label>Operatori Assegnati:</label>
+                    <ul id="missioneOperatori" class="list-container"></ul>
+                </div>
+
+                <div class="detail-item full-width">
+                    <label>Posizione su Mappa:</label>
+                    <div id="missioneMap" style="height: 300px; border-radius: 8px; margin-top: 10px;"></div>
+                </div>
+            </div>
+
+            <div class="modal-actions">
+                <button id="btnModificaMissione" class="btn-secondary">Modifica</button>
+                <button id="btnChiudiMissione" class="btn-success">Chiudi Missione</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal: Operatore -->
+    <div id="operatoreModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>Operatore #<span id="operatoreId"></span></h2>
+
+            <div class="detail-grid">
+                <div class="detail-item">
+                    <label>Nome:</label>
+                    <span id="operatoreNome"></span>
+                </div>
+
+                <div class="detail-item">
+                    <label>Email:</label>
+                    <span id="operatoreEmail"></span>
+                </div>
+
+                <div class="detail-item">
+                    <label>Telefono:</label>
+                    <span id="operatoreTelefono"></span>
+                </div>
+
+                <div class="detail-item">
+                    <label>Disponibile:</label>
+                    <span id="operatoreDisponibile"></span>
+                </div>
+
+                <div class="detail-item full-width">
+                    <label>Missioni dell'Operatore:</label>
+                    <ul id="operatoreMissioni" class="list-container"></ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal: Nuova Missione -->
+    <div id="nuovaMissioneModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>Nuova Missione (Richiesta #<span id="nmRichiestaId"></span>)</h2>
+
+            <form id="nuovaMissioneForm">
+                <input type="hidden" id="nmRichiestaIdInput">
+                <div class="detail-grid">
+                    <div class="detail-item full-width">
+                        <label for="nmObiettivo">Obiettivo:</label>
+                        <input type="text" id="nmObiettivo" required
+                            style="width: 100%; padding: 0.5rem; margin-top: 0.5rem;"
+                            placeholder="Descrivi l'obiettivo della missione">
+                    </div>
+
+                    <div class="detail-item full-width">
+                        <label for="nmPosizione">Posizione:</label>
+                        <input type="text" id="nmPosizione" value="Partiti dalla centrale" required
+                            style="width: 100%; padding: 0.5rem; margin-top: 0.5rem;"
+                            placeholder="Posizione attuale della squadra">
+                    </div>
+
+                    <div class="detail-item full-width">
+                        <label for="nmCaposquadra">Caposquadra:</label>
+                        <select id="nmCaposquadra" required style="width: 100%; padding: 0.5rem; margin-top: 0.5rem;">
+                            <option value="">Seleziona un caposquadra...</option>
+                        </select>
+                    </div>
+
+                    <div class="detail-item full-width">
+                        <label>Operatori (seleziona almeno 1):</label>
+                        <div id="nmOperatoriList"
+                            style="max-height: 200px; overflow-y: auto; border: 1px solid #ccc; padding: 0.5rem; margin-top: 0.5rem; background: #fff;">
+                            <!-- Checkbox operatori -->
+                            <p style="color: #666; font-style: italic;">Caricamento operatori...</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal-actions">
+                    <button type="submit" class="btn-primary">Crea Missione</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal: Modifica Richiesta -->
+    <div id="modificaRichiestaModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>Modifica Richiesta #<span id="mrId"></span></h2>
+
+            <form id="modificaRichiestaForm">
+                <input type="hidden" id="mrIdInput">
+                <div class="detail-grid">
+                    <div class="detail-item">
+                        <label for="mrStato">Stato:</label>
+                        <select id="mrStato" name="stato" required style="width: 100%; padding: 0.5rem;">
+                            <option value="INVIATA">Inviata</option>
+                            <option value="CONVALIDATA">Convalidata</option>
+                            <option value="IN_CORSO">In Corso</option>
+                            <option value="CHIUSA">Chiusa</option>
+                            <option value="ANNULLATA">Annullata</option>
+                            <option value="IGNORATA">Ignorata</option>
+                        </select>
+                    </div>
+
+                    <div class="detail-item full-width">
+                        <label for="mrDescrizione">Descrizione:</label>
+                        <textarea id="mrDescrizione" name="descrizione" rows="3"
+                            style="width: 100%; padding: 0.5rem;"></textarea>
+                    </div>
+
+                    <div class="detail-item full-width">
+                        <label for="mrIndirizzo">Indirizzo:</label>
+                        <input type="text" id="mrIndirizzo" name="indirizzo" style="width: 100%; padding: 0.5rem;">
+                    </div>
+
+                    <div class="detail-item">
+                        <label for="mrLatitudine">Latitudine:</label>
+                        <input type="number" step="any" id="mrLatitudine" name="latitudine"
+                            style="width: 100%; padding: 0.5rem;">
+                    </div>
+
+                    <div class="detail-item">
+                        <label for="mrLongitudine">Longitudine:</label>
+                        <input type="number" step="any" id="mrLongitudine" name="longitudine"
+                            style="width: 100%; padding: 0.5rem;">
+                    </div>
+                </div>
+
+                <div class="modal-actions">
+                    <button type="submit" class="btn-primary">Salva Modifiche</button>
+                    <button type="button" class="btn-secondary close">Annulla</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal: Modifica Missione -->
+    <div id="modificaMissioneModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>Modifica Missione #<span id="mmId"></span></h2>
+
+            <form id="modificaMissioneForm">
+                <input type="hidden" id="mmIdInput">
+                <div class="detail-grid">
+                    <div class="detail-item">
+                        <label for="mmStato">Stato:</label>
+                        <select id="mmStato" name="stato" required style="width: 100%; padding: 0.5rem;">
+                            <option value="IN_CORSO">In Corso</option>
+                            <option value="CHIUSA">Chiusa</option>
+                            <option value="FALLITA">Fallita</option>
+                        </select>
+                    </div>
+
+                    <div class="detail-item">
+                        <label for="mmLivelloSuccesso">Livello Successo (1-10):</label>
+                        <input type="number" min="1" max="10" id="mmLivelloSuccesso" name="livello_successo"
+                            style="width: 100%; padding: 0.5rem;">
+                    </div>
+
+                    <div class="detail-item full-width">
+                        <label for="mmPosizione">Posizione:</label>
+                        <input type="text" id="mmPosizione" name="posizione" style="width: 100%; padding: 0.5rem;">
+                    </div>
+
+                    <div class="detail-item full-width">
+                        <label for="mmObiettivo">Obiettivo:</label>
+                        <textarea id="mmObiettivo" name="obiettivo" rows="3"
+                            style="width: 100%; padding: 0.5rem;"></textarea>
+                    </div>
+
+                    <div class="detail-item full-width">
+                        <label for="mmCommenti">Commenti Finali:</label>
+                        <textarea id="mmCommenti" name="commenti_finali" rows="3"
+                            style="width: 100%; padding: 0.5rem;"></textarea>
+                    </div>
+                </div>
+
+                <div class="modal-actions">
+                    <button type="submit" class="btn-primary">Salva Modifiche</button>
+                    <button type="button" class="btn-secondary close">Annulla</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <!-- Leaflet JS -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+    <!-- SweetAlert2 JS -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <!-- App Scripts -->
+    <script src="js/api.js"></script>
+    <script src="js/dashboard.js"></script>
+    <script src="js/missioni.js"></script>
+    <script src="js/operatori.js"></script>
+</body>
+
+</html>

@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SoccorsoWeb - Login</title>
+    <link rel="stylesheet" href="css/login.css">
+</head>
+<body>
+    <header>
+        <h1>LOGIN</h1>
+    </header>
+
+    <main>
+        <h2>Entra nella tua area personale</h2>
+        <form id="loginForm">
+            <label>Email*</label>
+            <input type="email" id="email" required>
+
+            <label>Password *</label>
+            <input type="password" id="password" required>
+
+            <button type="submit">Login</button>
+        </form>
+        <div id="message"></div>
+    </main>
+
+    <script src="js/api.js"></script>
+    <script src="js/login.js"></script>
+</body>
+</html>

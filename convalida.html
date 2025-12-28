@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="it">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Convalida Richiesta - SoccorsoWeb</title>
+    <style>
+        .convalida-container {
+            max-width: 600px;
+            margin: 100px auto;
+            padding: 2rem;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+
+        .convalida-icon {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+        }
+
+        .loading {
+            color: #007bff;
+        }
+
+        .success {
+            color: #28a745;
+        }
+
+        .error {
+            color: #dc3545;
+        }
+
+        .convalida-message {
+            font-size: 1.2rem;
+            margin: 1rem 0;
+        }
+
+        .convalida-details {
+            color: #666;
+            margin-top: 1rem;
+            font-size: 0.9rem;
+        }
+
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #007bff;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        .btn-home {
+            display: inline-block;
+            margin-top: 2rem;
+            padding: 0.75rem 2rem;
+            background: #007bff;
+            color: white;
+            text-decoration: none;
+            border-radius: 6px;
+            transition: background 0.3s;
+        }
+
+        .btn-home:hover {
+            background: #0056b3;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="convalida-container">
+        <div id="loadingState">
+            <div class="convalida-icon loading">⏳</div>
+            <div class="spinner"></div>
+            <h2>Convalida in corso...</h2>
+            <p class="convalida-details">Stiamo verificando la tua richiesta di soccorso.</p>
+        </div>
+
+        <div id="successState" style="display: none;">
+            <div class="convalida-icon success">✅</div>
+            <h2>Richiesta Convalidata!</h2>
+            <p class="convalida-message">La tua richiesta di soccorso è stata convalidata con successo.</p>
+            <p class="convalida-details">Sarai reindirizzato alla home page tra <span id="countdown">5</span> secondi...
+            </p>
+            <a href="index.html" class="btn-home">Vai alla Home</a>
+        </div>
+
+        <div id="errorState" style="display: none;">
+            <div class="convalida-icon error">❌</div>
+            <h2>Errore di Convalida</h2>
+            <p class="convalida-message" id="errorMessage">Si è verificato un errore durante la convalida.</p>
+            <p class="convalida-details">Il link potrebbe essere scaduto o non valido.</p>
+            <a href="index.html" class="btn-home">Torna alla Home</a>
+        </div>
+    </div>
+
+    <script src="js/api.js"></script>
+    <script src="js/convalida.js"></script>
+</body>
+
+</html>
