@@ -137,6 +137,9 @@ document.addEventListener('DOMContentLoaded', function () {
             document.getElementById('richiestaConvalidataAt').textContent = dettagli.convalidata_at ?
                 new Date(dettagli.convalidata_at).toLocaleString('it-IT') : 'Non convalidata';
 
+            // Valutazione
+            document.getElementById('richiestaValutazione').textContent = dettagli.livello_successo || 'N/D';
+
             // Foto
             const fotoContainer = document.getElementById('richiestaFotoContainer');
             if (dettagli.foto_url) {
@@ -241,6 +244,9 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     }
 
+    // Rendi globale la funzione per permettere il click dalle altre tab
+    window.mostraDettagliRichiesta = mostraDettagliRichiesta;
+
     // ===== GESTIONE TABS =====
     const tabButtons = document.querySelectorAll('.tab-btn');
     const tabContents = document.querySelectorAll('.tab-content');
@@ -271,8 +277,8 @@ document.addEventListener('DOMContentLoaded', function () {
                     caricaTutteLeMissioni();
                 }
             } else if (tabName === 'missioni-non-positive') {
-                if (typeof mostraMissioniNonPositive === 'function') {
-                    mostraMissioniNonPositive();
+                if (typeof mostraRichiesteNonPositive === 'function') {
+                    mostraRichiesteNonPositive();
                 }
             } else if (tabName === 'operatori') {
                 if (typeof caricaOperatoriLiberi === 'function') {
@@ -299,6 +305,7 @@ document.addEventListener('DOMContentLoaded', function () {
         document.getElementById('mrIndirizzo').value = data.indirizzo || '';
         document.getElementById('mrLatitudine').value = data.latitudine || '';
         document.getElementById('mrLongitudine').value = data.longitudine || '';
+        document.getElementById('mrLivelloSuccesso').value = data.livello_successo || '';
 
         // Chiudi modal dettagli e apri modal modifica
         document.getElementById('richiestaModal').classList.remove('active');
@@ -315,7 +322,8 @@ document.addEventListener('DOMContentLoaded', function () {
             descrizione: document.getElementById('mrDescrizione').value || undefined,
             indirizzo: document.getElementById('mrIndirizzo').value || undefined,
             latitudine: document.getElementById('mrLatitudine').value ? parseFloat(document.getElementById('mrLatitudine').value) : undefined,
-            longitudine: document.getElementById('mrLongitudine').value ? parseFloat(document.getElementById('mrLongitudine').value) : undefined
+            longitudine: document.getElementById('mrLongitudine').value ? parseFloat(document.getElementById('mrLongitudine').value) : undefined,
+            livello_successo: document.getElementById('mrLivelloSuccesso').value ? parseInt(document.getElementById('mrLivelloSuccesso').value) : undefined
         };
 
         // Rimuovi campi undefined
@@ -342,7 +350,6 @@ document.addEventListener('DOMContentLoaded', function () {
         document.getElementById('mmId').textContent = data.id;
         document.getElementById('mmIdInput').value = data.id;
         document.getElementById('mmStato').value = data.stato || '';
-        document.getElementById('mmLivelloSuccesso').value = data.livello_successo || '';
         document.getElementById('mmPosizione').value = data.posizione || '';
         document.getElementById('mmObiettivo').value = data.obiettivo || '';
         document.getElementById('mmCommenti').value = data.commenti_finali || '';
@@ -359,7 +366,6 @@ document.addEventListener('DOMContentLoaded', function () {
         const id = document.getElementById('mmIdInput').value;
         const data = {
             stato: document.getElementById('mmStato').value,
-            livello_successo: document.getElementById('mmLivelloSuccesso').value ? parseInt(document.getElementById('mmLivelloSuccesso').value) : undefined,
             posizione: document.getElementById('mmPosizione').value || undefined,
             obiettivo: document.getElementById('mmObiettivo').value || undefined,
             commenti_finali: document.getElementById('mmCommenti').value || undefined
@@ -376,9 +382,6 @@ document.addEventListener('DOMContentLoaded', function () {
             // Ricarica liste
             if (typeof caricaTutteLeMissioni === 'function') {
                 caricaTutteLeMissioni();
-            }
-            if (typeof mostraMissioniNonPositive === 'function') {
-                mostraMissioniNonPositive();
             }
         } catch (error) {
             console.error('Errore aggiornamento missione:', error);

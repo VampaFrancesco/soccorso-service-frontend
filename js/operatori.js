@@ -65,7 +65,7 @@ async function mostraDettagliOperatore(id) {
         if (missioni && missioni.length > 0) {
             missioni.forEach(missione => {
                 const li = document.createElement('li');
-                li.textContent = `Missione #${missione.id} - Stato: ${formattaStato(missione.stato)} - Valutazione: ${missione.livello_successo}/10`;
+                li.textContent = `Missione #${missione.id} - Stato: ${formattaStato(missione.stato)}`;
                 missioniList.appendChild(li);
             });
         } else {
@@ -83,6 +83,6 @@ async function mostraDettagliOperatore(id) {
 }
 
 // Bottone aggiorna operatori
-document.getElementById('btnAggornaOperatori')?.addEventListener('click', function () {
+document.getElementById('btnAggiornaOperatori')?.addEventListener('click', function () {
     caricaOperatoriLiberi();
 });

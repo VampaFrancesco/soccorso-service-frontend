@@ -87,9 +87,9 @@ async function visualizzaTutteLeMissioni() {
     return await apiCall('/swa/api/missioni', 'GET', null, true);
 }
 
-//API 5
-async function visualizzaMissioniEsitoNegativo() {
-    return await apiCall('/swa/api/missioni/non-positive', 'GET', null, true);
+//API 5 - Richieste Non Positive
+async function visualizzaRichiesteNonPositive() {
+    return await apiCall('/swa/api/richieste/non-positive', 'GET', null, true);
 }
 
 //API 6
@@ -104,7 +104,7 @@ async function inserimentoMissione(missione) {
 
 //API 8
 async function chiudiMissione(id) {
-    return await apiCall('/swa/api/missioni/' + id + '/chiusura', 'PATCH', null, true);
+    return await apiCall('/swa/api/missioni/' + id + '/modifica-stato?nuovo_stato=CHIUSA', 'PATCH', null, true);
 }
 
 //API 9
@@ -145,4 +145,9 @@ async function aggiornaMissione(id, data) {
 //API 16 - Conferma Convalida
 async function convalidaRichiesta(token) {
     return await apiCall('/swa/open/richieste/conferma-convalida', 'POST', { token_convalida: token }, false);
+}
+
+//API 17 - Valuta Richiesta
+async function valutaRichiesta(id, valutazione) {
+    return await apiCall(`/swa/api/richieste/${id}/valutazione`, 'PATCH', { livello_successo: valutazione }, true);
 }

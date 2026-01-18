@@ -26,7 +26,6 @@ async function caricaTutteLeMissioni() {
                     </div>
                     <div class="card-body">
                         <p><strong>Obiettivo:</strong> ${missione.obiettivo || 'N/D'}</p>
-                        <p><strong>Valutazione:</strong> ${missione.livello_successo || 'N/D'}/10</p>
                         <p><strong>Data:</strong> ${new Date(missione.created_at).toLocaleDateString('it-IT') || 'N/D'}</p>
                     </div>
                 </div>
@@ -53,51 +52,55 @@ async function caricaTutteLeMissioni() {
 
 // ===== GESTIONE MISSIONI NON POSITIVE =====
 
-async function mostraMissioniNonPositive() {
-    console.log('🔎 Carico missioni negative...');
+
+async function mostraRichiesteNonPositive() {
+    console.log('🔎 Carico richieste non positive...');
 
     try {
-        const missioni = await visualizzaMissioniEsitoNegativo();
-        console.log('✅ Missioni ricevute:', missioni);
+        const richieste = await visualizzaRichiesteNonPositive();
+        console.log('✅ Richieste ricevute:', richieste);
 
         const container = document.getElementById('missioniNonPositiveList');
         container.innerHTML = '';
 
-        if (!missioni || missioni.length === 0) {
-            container.innerHTML = '<p style="text-align:center; color:#999; padding:2rem;">Nessuna missione trovata</p>';
+        if (!richieste || richieste.length === 0) {
+            container.innerHTML = '<p style="text-align:center; color:#999; padding:2rem;">Nessuna richiesta trovata</p>';
             return;
         }
 
-        missioni.forEach(missione => {
-            const statoFormattato = formattaStato(missione.stato);
+        richieste.forEach(richiesta => {
+            const statoFormattato = formattaStato(richiesta.stato);
 
             const cardHTML = `
-                <div class="card" data-id="${missione.id}">
+                <div class="card" data-id="${richiesta.id}">
                     <div class="card-header">
-                        <span class="card-title">Missione #${missione.id}</span>
-                        <span class="badge ${missione.stato}">${statoFormattato}</span>
+                        <span class="card-title">Richiesta #${richiesta.id}</span>
+                        <span class="badge ${richiesta.stato}">${statoFormattato}</span>
                     </div>
                     <div class="card-body">
-                        <p><strong>Valutazione:</strong> ${missione.livello_successo || 'N/D'}/10</p>
-                        <p><strong>Stato:</strong> ${statoFormattato}</p>
-                        <p><strong>Data:</strong> ${new Date(missione.created_at).toLocaleDateString('it-IT') || 'N/D'}</p>
+                        <p><strong>Nome:</strong> ${richiesta.nome_segnalante || 'N/D'}</p>
+                        <p><strong>Valutazione:</strong> ${richiesta.livello_successo || 'N/D'}/10</p>
+                        <p><strong>Data:</strong> ${new Date(richiesta.created_at).toLocaleDateString('it-IT') || 'N/D'}</p>
                     </div>
                 </div>
             `;
             container.innerHTML += cardHTML;
         });
 
-        // Aggiungi click per aprire dettagli
+        // Aggiungi click per aprire dettagli richiesta
         const cards = document.querySelectorAll('#missioniNonPositiveList .card');
         cards.forEach(card => {
             card.addEventListener('click', async function () {
-                const missioneId = card.getAttribute('data-id');
-                await mostraDettagliMissione(missioneId);
+                const richiestaId = card.getAttribute('data-id');
+                // Usa la funzione mostraDettagliRichiesta definita in dashboard.js
+                if (typeof mostraDettagliRichiesta === 'function') {
+                    await mostraDettagliRichiesta(richiestaId);
+                }
             });
         });
 
     } catch (error) {
-        console.error('❌ Errore caricamento missioni:', error);
+        console.error('❌ Errore caricamento richieste:', error);
         const container = document.getElementById('missioniNonPositiveList');
         container.innerHTML = '<p style="text-align:center; color:#dc3545; padding:2rem;">Errore nel caricamento</p>';
     }
@@ -119,7 +122,6 @@ async function mostraDettagliMissione(id) {
         document.getElementById('missioneId').textContent = dettagli.id || 'N/D';
         document.getElementById('missioneStato').textContent = statoFormattato;
         document.getElementById('missioneStato').className = `badge ${dettagli.stato}`;
-        document.getElementById('missioneValutazione').textContent = dettagli.livello_successo || 'N/D';
         document.getElementById('missioneRichiestaId').textContent = dettagli.richiesta_id || 'N/D';
         document.getElementById('missioneNumeroOperatori').textContent = dettagli.numero_operatori || (dettagli.operatori ? dettagli.operatori.length : 0);
         document.getElementById('missioneObiettivo').textContent = dettagli.obiettivo || 'N/D';

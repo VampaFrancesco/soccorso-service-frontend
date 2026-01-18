@@ -34,7 +34,7 @@
     <nav class="tabs">
         <button class="tab-btn active" data-tab="richieste">📋 Richieste</button>
         <button class="tab-btn" data-tab="missioni">🚀 Missioni</button>
-        <button class="tab-btn" data-tab="missioni-non-positive">⚠️ Missioni Non Positive</button>
+        <button class="tab-btn" data-tab="missioni-non-positive">⚠️ Richieste Non Positive</button>
         <button class="tab-btn" data-tab="operatori">👥 Operatori Liberi</button>
     </nav>
 
@@ -75,10 +75,10 @@
             <div id="missioniList" class="card-grid"></div>
         </div>
 
-        <!-- Tab Content: Missioni Non Positive -->
+        <!-- Tab Content: Richieste Non Positive -->
         <div id="missioni-non-positive" class="tab-content">
             <div class="section-header">
-                <h2>Missioni Non Positive (Successo &lt; 5)</h2>
+                <h2>Richieste Non Positive (Valutazione &lt; 5)</h2>
             </div>
             <div id="missioniNonPositiveList" class="card-grid"></div>
         </div>
@@ -165,6 +165,11 @@
                     <span id="richiestaConvalidataAt"></span>
                 </div>
 
+                <div class="detail-item">
+                    <label>Valutazione:</label>
+                    <span id="richiestaValutazione"></span>/10
+                </div>
+
                 <div class="detail-item full-width">
                     <label>Descrizione:</label>
                     <p id="richiestaNote"></p>
@@ -204,11 +209,6 @@
                 <div class="detail-item">
                     <label>ID Richiesta:</label>
                     <span id="missioneRichiestaId"></span>
-                </div>
-
-                <div class="detail-item">
-                    <label>Valutazione:</label>
-                    <span id="missioneValutazione"></span>/10
                 </div>
 
                 <div class="detail-item">
@@ -399,6 +399,12 @@
                         <input type="number" step="any" id="mrLongitudine" name="longitudine"
                             style="width: 100%; padding: 0.5rem;">
                     </div>
+
+                    <div class="detail-item">
+                        <label for="mrLivelloSuccesso">Valutazione (1-10):</label>
+                        <input type="number" min="1" max="10" id="mrLivelloSuccesso" name="livello_successo"
+                            style="width: 100%; padding: 0.5rem;">
+                    </div>
                 </div>
 
                 <div class="modal-actions">
@@ -418,19 +424,13 @@
             <form id="modificaMissioneForm">
                 <input type="hidden" id="mmIdInput">
                 <div class="detail-grid">
-                    <div class="detail-item">
+                    <div class="detail-item full-width">
                         <label for="mmStato">Stato:</label>
                         <select id="mmStato" name="stato" required style="width: 100%; padding: 0.5rem;">
                             <option value="IN_CORSO">In Corso</option>
                             <option value="CHIUSA">Chiusa</option>
                             <option value="FALLITA">Fallita</option>
                         </select>
-                    </div>
-
-                    <div class="detail-item">
-                        <label for="mmLivelloSuccesso">Livello Successo (1-10):</label>
-                        <input type="number" min="1" max="10" id="mmLivelloSuccesso" name="livello_successo"
-                            style="width: 100%; padding: 0.5rem;">
                     </div>
 
                     <div class="detail-item full-width">
