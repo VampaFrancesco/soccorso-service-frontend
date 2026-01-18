@@ -78,8 +78,8 @@ async function inserisciRichiestaSoccorso(richiesta) {
 }
 
 //API 4
-async function visualizzaRichiesteFiltrate(stato) {
-    return await apiCall(`/swa/api/richieste?stato=${stato}`, 'GET', null, true);
+async function visualizzaRichiesteFiltrate(stato, page = 0, size = 20) {
+    return await apiCall(`/swa/api/richieste?stato=${stato}&page=${page}&size=${size}`, 'GET', null, true);
 }
 
 //API 4b - Tutte le Missioni

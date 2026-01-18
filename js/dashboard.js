@@ -50,20 +50,27 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // ===== GESTIONE RICHIESTE =====
     const filtro = document.getElementById('statoFilter');
+    let currentPage = 0;
+    const pageSize = 20;
 
     async function caricaRichieste() {
         const filtroSel = filtro.value;
-        console.log('🔎 Carico richieste con stato:', filtroSel);
+        console.log(`🔎 Carico richieste [Pagina ${currentPage}] con stato:`, filtroSel);
 
         try {
-            const richieste = await visualizzaRichiesteFiltrate(filtroSel);
-            console.log('✅ Richieste ricevute:', richieste);
+            const response = await visualizzaRichiesteFiltrate(filtroSel, currentPage, pageSize);
+            console.log('✅ Risposta ricevuta:', response);
+
+            // Il backend ora restituisce un oggetto Page { content: [], totalPages: X, ... }
+            const richieste = response ? response.content : [];
+            const totalPages = response ? response.totalPages : 0;
 
             const container = document.getElementById('richiesteList');
             container.innerHTML = '';
 
             if (!richieste || richieste.length === 0) {
                 container.innerHTML = '<p style="text-align:center; color:#999; padding:2rem;">Nessuna richiesta trovata</p>';
+                aggiornaUIPaginazione(0, 0);
                 return;
             }
 
@@ -96,12 +103,47 @@ document.addEventListener('DOMContentLoaded', function () {
                 });
             });
 
+            // Aggiorna la UI della paginazione
+            aggiornaUIPaginazione(currentPage, totalPages);
+
         } catch (error) {
             console.error('❌ Errore caricamento:', error);
             const container = document.getElementById('richiesteList');
             container.innerHTML = '<p style="text-align:center; color:#dc3545; padding:2rem;">Errore nel caricamento delle richieste</p>';
+            aggiornaUIPaginazione(0, 0);
         }
     }
+
+    function aggiornaUIPaginazione(current, total) {
+        const pageInfo = document.getElementById('pageInfo');
+        const prevBtn = document.getElementById('prevPage');
+        const nextBtn = document.getElementById('nextPage');
+
+        if (pageInfo) {
+            pageInfo.textContent = `Pagina ${current + 1} di ${total || 1}`;
+        }
+
+        if (prevBtn) {
+            prevBtn.disabled = (current === 0);
+        }
+
+        if (nextBtn) {
+            nextBtn.disabled = (current >= total - 1) || (total === 0);
+        }
+    }
+
+    // Listener per i bottoni di paginazione
+    document.getElementById('prevPage')?.addEventListener('click', () => {
+        if (currentPage > 0) {
+            currentPage--;
+            caricaRichieste();
+        }
+    });
+
+    document.getElementById('nextPage')?.addEventListener('click', () => {
+        currentPage++;
+        caricaRichieste();
+    });
 
     async function mostraDettagliRichiesta(id) {
         try {
@@ -289,7 +331,10 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 
     // Listener cambio filtro richieste
-    filtro.addEventListener('change', caricaRichieste);
+    filtro.addEventListener('change', () => {
+        currentPage = 0; // Resetta alla prima pagina quando cambia il filtro
+        caricaRichieste();
+    });
 
     // ===== GESTIONE MODIFICA RICHIESTA =====
     document.getElementById('btnModificaRichiesta')?.addEventListener('click', async function () {
